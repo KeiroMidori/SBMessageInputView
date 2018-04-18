@@ -23,24 +23,24 @@ protocol SBMessageInputViewDelegate: class {
 @IBDesignable
 class SBMessageInputView: UIView {
 
-    @IBInspectable var buttonImage: UIImage = getDefaultImage() {
+    @IBInspectable var buttonImage: UIImage = SBMessageInputView.getDefaultImage() {
         didSet {
             button.setImage(buttonImage, for: .normal)
         }
     }
-
-    @IBInspectable var borderColor: UIColor = .gray {
+    
+    @IBInspectable var viewBorderColor: UIColor = .gray {
         didSet {
-            mainView.layer.borderColor = borderColor.cgColor
-        }
-    }
-
-    @IBInspectable var borderWidth: CGFloat = 0.5 {
-        didSet {
-            mainView.layer.borderWidth = borderWidth
+            mainView.layer.borderColor = viewBorderColor.cgColor
         }
     }
     
+    @IBInspectable var viewBorderWidth: CGFloat = 0.5 {
+        didSet {
+            mainView.layer.borderWidth = viewBorderWidth
+        }
+    }
+
     @IBInspectable var maxLines: CGFloat = 5.0
     
     @IBInspectable var textViewTopInset: CGFloat = 3.5 {
@@ -113,7 +113,7 @@ class SBMessageInputView: UIView {
         
         mainView.layer.cornerRadius = containerViewHeight / 2.0
         setTextView()
-        textView.setContentOffset(CGPoint(x: -textViewLeftInset, y: -textViewTopInset), animated: false)
+        textView.setContentOffset(CGPoint(x: -textViewLeftInset - 20, y: -textViewTopInset), animated: false)
     }
     
     fileprivate func setupView() {
@@ -175,26 +175,13 @@ class SBMessageInputView: UIView {
             
             textView.clipsToBounds = true
             textView.layer.cornerRadius = containerViewHeight / 2.0
-            if #available(iOS 11.0, *) {
-                textView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMinXMaxYCorner]
-            } else {
-                let rectShape = CAShapeLayer()
-                rectShape.bounds = textView.frame
-                rectShape.position = textView.center
-                rectShape.path = UIBezierPath(roundedRect: textView.bounds, byRoundingCorners: [.bottomLeft , .topLeft], cornerRadii: CGSize(width: textView.layer.cornerRadius, height: textView.layer.cornerRadius)).cgPath
-                
-                textView.layer.backgroundColor = UIColor.green.cgColor
-                textView.layer.mask = rectShape
-            }
-            textView.contentInset = UIEdgeInsets(top: textViewTopInset, left: textViewLeftInset, bottom: 0.0, right: 0)
-            
-            button.layer.cornerRadius = buttonViewHeight / 2.0
+            textView.contentInset = UIEdgeInsets(top: textViewTopInset, left: 0.0, bottom: 0.0, right: 0.0)
             
             mainView.addSubview(textView)
             mainView.addSubview(button)
             
             textView.translatesAutoresizingMaskIntoConstraints = false
-            textView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: 0.0).isActive = true
+            textView.leadingAnchor.constraint(equalTo: mainView.leadingAnchor, constant: textViewLeftInset).isActive = true
             textView.topAnchor.constraint(equalTo: mainView.topAnchor, constant: 0.0).isActive = true
             textView.bottomAnchor.constraint(equalTo: mainView.bottomAnchor, constant: 0.0).isActive = true
             
