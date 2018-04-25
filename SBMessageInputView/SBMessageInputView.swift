@@ -43,7 +43,7 @@ class SBMessageInputView: UIView {
 
     @IBInspectable var maxLines: CGFloat = 5.0
     
-    @IBInspectable var textViewTopInset: CGFloat = 3.5 {
+    @IBInspectable var textViewTopInset: CGFloat = 0.0 {
         didSet {
             textView.contentInset = UIEdgeInsets(top: textViewTopInset, left: textView.contentInset.left, bottom: textView.contentInset.bottom, right: textView.contentInset.right)
         }
@@ -97,7 +97,7 @@ class SBMessageInputView: UIView {
     }
     
     class func getDefaultImage()-> UIImage {
-        if let defaultImage = UIImage(named: "oval8") {
+        if let defaultImage = UIImage(named: "send") {
             return defaultImage
         } else {
             return UIImage()
@@ -176,6 +176,7 @@ class SBMessageInputView: UIView {
             textView.clipsToBounds = true
             textView.layer.cornerRadius = containerViewHeight / 2.0
             textView.contentInset = UIEdgeInsets(top: textViewTopInset, left: 0.0, bottom: 0.0, right: 0.0)
+            textView.font = UIFont.systemFont(ofSize: 18.0)
             
             mainView.addSubview(textView)
             mainView.addSubview(button)
