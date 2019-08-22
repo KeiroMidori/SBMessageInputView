@@ -99,6 +99,7 @@
 				TargetAttributes = {
 					996D90AB20855C2A00C8D367 = {
 						CreatedOnToolsVersion = 9.3;
+						LastSwiftMigration = 1030;
 					};
 				};
 			};
@@ -294,7 +295,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = sb.SBMessageInputView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -313,7 +314,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = sb.SBMessageInputView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.0;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;

@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol SBMessageInputViewDelegate: class {
+protocol SBMessageInputViewDelegate: AnyObject {
     
     // TextViewDelegate methods
     func inputView(textView: UITextView, shouldChangeTextInRange: NSRange, replacementText: String) -> Bool
