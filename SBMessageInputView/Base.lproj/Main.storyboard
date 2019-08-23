@@ -41,7 +41,7 @@
                                     <userDefinedRuntimeAttribute type="number" keyPath="viewBorderWidth">
                                         <real key="value" value="2"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="This is a placeholder"/>
+                                    <userDefinedRuntimeAttribute type="string" keyPath="placeholder" value="This is a placeholder..."/>
                                     <userDefinedRuntimeAttribute type="color" keyPath="placeholderColor">
                                         <color key="value" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                     </userDefinedRuntimeAttribute>
