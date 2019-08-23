@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol SBMessageInputViewDelegate: class {
+protocol SBMessageInputViewDelegate: AnyObject {
     
     // TextViewDelegate methods
     func inputView(textView: UITextView, shouldChangeTextInRange: NSRange, replacementText: String) -> Bool
@@ -23,21 +23,28 @@ protocol SBMessageInputViewDelegate: class {
 @IBDesignable
 class SBMessageInputView: UIView {
 
+    @IBInspectable var placeholder: String = ""
+    @IBInspectable var placeholderColor: UIColor = .lightGray
+    @IBInspectable var textColor: UIColor = .black
+
     @IBInspectable var buttonImage: UIImage = SBMessageInputView.getDefaultImage() {
         didSet {
-            button.setImage(buttonImage, for: .normal)
+            guard let b = button else { return }
+            b.setImage(buttonImage, for: .normal)
         }
     }
     
     @IBInspectable var viewBorderColor: UIColor = .gray {
         didSet {
-            mainView.layer.borderColor = viewBorderColor.cgColor
+            guard let mv = mainView else { return }
+            mv.layer.borderColor = viewBorderColor.cgColor
         }
     }
     
     @IBInspectable var viewBorderWidth: CGFloat = 0.5 {
         didSet {
-            mainView.layer.borderWidth = viewBorderWidth
+            guard let mv = mainView else { return }
+            mv.layer.borderWidth = viewBorderWidth
         }
     }
 
@@ -45,13 +52,15 @@ class SBMessageInputView: UIView {
     
     @IBInspectable var textViewTopInset: CGFloat = 0.0 {
         didSet {
-            textView.contentInset = UIEdgeInsets(top: textViewTopInset, left: textView.contentInset.left, bottom: textView.contentInset.bottom, right: textView.contentInset.right)
+            guard let tv = textView else { return }
+            tv.contentInset = UIEdgeInsets(top: textViewTopInset, left: tv.contentInset.left, bottom: tv.contentInset.bottom, right: tv.contentInset.right)
         }
     }
     
     @IBInspectable var textViewLeftInset: CGFloat = 8.0 {
         didSet {
-            textView.contentInset = UIEdgeInsets(top: textView.contentInset.top, left: textViewLeftInset, bottom: textView.contentInset.bottom, right: textView.contentInset.right)
+            guard let tv = textView else { return }
+            tv.contentInset = UIEdgeInsets(top: tv.contentInset.top, left: textViewLeftInset, bottom: tv.contentInset.bottom, right: tv.contentInset.right)
         }
     }
 
@@ -68,9 +77,9 @@ class SBMessageInputView: UIView {
     }
     
     // Views
-    var mainView = UIView()
-    var textView = UITextView(frame: .zero)
-    var button = UIButton()
+    var mainView: UIView?
+    var textView: UITextView?
+    var button: UIButton?
     var heightConstraint: NSLayoutConstraint?
     
     // Heights
@@ -107,13 +116,10 @@ class SBMessageInputView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        if originalViewHeight == 0 {
-            originalViewHeight = frame.height
-        }
-        
-        mainView.layer.cornerRadius = containerViewHeight / 2.0
+        if originalViewHeight == 0 { originalViewHeight = frame.height }
+        if let mv = mainView { mv.layer.cornerRadius = containerViewHeight / 2.0 }
         setTextView()
-        textView.setContentOffset(CGPoint(x: -textViewLeftInset - 20, y: -textViewTopInset), animated: false)
+        if let tv = textView { tv.setContentOffset(CGPoint(x: -textViewLeftInset - 20, y: -textViewTopInset), animated: false) }
     }
     
     fileprivate func setupView() {
@@ -151,25 +157,34 @@ class SBMessageInputView: UIView {
     }
     
     fileprivate func setContainerView() {
-        mainView = UIView(frame: .zero)
-        addSubview(mainView)
-        
-        mainView.translatesAutoresizingMaskIntoConstraints = false
-        let leadingConstraint = NSLayoutConstraint(item: mainView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 16)
-        let trailingConstraint = NSLayoutConstraint(item: self, attribute: .trailing, relatedBy: .equal, toItem: mainView, attribute: .trailing, multiplier: 1, constant: 16)
-        let topConstraint = NSLayoutConstraint(item: mainView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 4)
-        let bottomConstraint = NSLayoutConstraint(item: self, attribute: .bottom, relatedBy: .equal, toItem: mainView, attribute: .bottom, multiplier: 1, constant: 4)
-        
-        addConstraints([topConstraint, bottomConstraint, leadingConstraint, trailingConstraint])
+        if mainView == nil {
+            mainView = UIView(frame: .zero)
+            guard let mainView = self.mainView else { return }
+            addSubview(mainView)
+            
+            mainView.translatesAutoresizingMaskIntoConstraints = false
+            let leadingConstraint = NSLayoutConstraint(item: mainView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 16)
+            let trailingConstraint = NSLayoutConstraint(item: self, attribute: .trailing, relatedBy: .equal, toItem: mainView, attribute: .trailing, multiplier: 1, constant: 16)
+            let topConstraint = NSLayoutConstraint(item: mainView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 4)
+            let bottomConstraint = NSLayoutConstraint(item: self, attribute: .bottom, relatedBy: .equal, toItem: mainView, attribute: .bottom, multiplier: 1, constant: 4)
+            
+            addConstraints([topConstraint, bottomConstraint, leadingConstraint, trailingConstraint])
+        }
     }
     
     fileprivate func setTextView() {
-        
-        if textView.delegate == nil {
+        if textView == nil {
             textView = UITextView(frame: .zero)
+            button = UIButton(type: .custom)
+            
+            guard let button = self.button, let textView = self.textView, let mainView = self.mainView else { return }
             textView.delegate = self
             
-            button = UIButton(type: .custom)
+            if !placeholder.isEmpty {
+                textView.text = placeholder
+                textView.textColor = placeholderColor
+            }
+            
             button.setImage(buttonImage, for: .normal)
             button.addTarget(self, action: #selector(didTapButton(sender:)), for: .touchUpInside)
             
@@ -212,13 +227,26 @@ extension SBMessageInputView: UITextViewDelegate {
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
+        
+        if (textView.text == placeholder && textView.textColor == placeholderColor) {
+            textView.text = ""
+            textView.textColor = textColor
+        }
+        
         if let delegate = delegate {
             delegate.inputViewDidBeginEditing(textView: textView)
         }
     }
     
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if (textView.text.isEmpty) {
+            textView.text = placeholder
+            textView.textColor = placeholderColor
+        }
+    }
+    
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        
+
         if let delegate = delegate {
             return delegate.inputView(textView: textView, shouldChangeTextInRange: range, replacementText: text)
         }
