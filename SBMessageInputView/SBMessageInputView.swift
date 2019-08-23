@@ -23,6 +23,10 @@ protocol SBMessageInputViewDelegate: AnyObject {
 @IBDesignable
 class SBMessageInputView: UIView {
 
+    @IBInspectable var placeholder: String = ""
+    @IBInspectable var placeholderColor: UIColor = .lightGray
+    @IBInspectable var textColor: UIColor = .black
+
     @IBInspectable var buttonImage: UIImage = SBMessageInputView.getDefaultImage() {
         didSet {
             button.setImage(buttonImage, for: .normal)
@@ -169,6 +173,11 @@ class SBMessageInputView: UIView {
             textView = UITextView(frame: .zero)
             textView.delegate = self
             
+            if !placeholder.isEmpty {
+                textView.text = placeholder
+                textView.textColor = placeholderColor
+            }
+            
             button = UIButton(type: .custom)
             button.setImage(buttonImage, for: .normal)
             button.addTarget(self, action: #selector(didTapButton(sender:)), for: .touchUpInside)
@@ -212,8 +221,21 @@ extension SBMessageInputView: UITextViewDelegate {
     }
     
     func textViewDidBeginEditing(_ textView: UITextView) {
+        
+        if (textView.text == placeholder && textView.textColor == .lightGray) {
+            textView.text = ""
+            textView.textColor = textColor
+        }
+        
         if let delegate = delegate {
             delegate.inputViewDidBeginEditing(textView: textView)
+        }
+    }
+    
+    func textViewDidEndEditing(_ textView: UITextView) {
+        if (textView.text == "") {
+            textView.text = placeholder
+            textView.textColor = placeholderColor
         }
     }
     
